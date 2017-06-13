@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+    <head>
+        <title th:remove="all">Client Confirmation</title>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    </head>
+    <body>
+        <div>
+            <h2 th:text="#{greeting(${user})}">
+                </span> User
+            </h2>
+            <p th:text="${description}">
+                Description
+            </p>
+            <p>
+                You have been successfully subscribed to the <b>Fake newsletter</b> on
+                <span th:text="${#dates.format(date)}">28-12-2012</span>
+            </p>
+            <p th:text="${token}">
+                Token
+            </p>
+        </div>
+    </body>
+</html>
