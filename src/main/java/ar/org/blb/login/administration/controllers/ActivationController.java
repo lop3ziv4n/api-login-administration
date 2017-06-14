@@ -21,6 +21,7 @@ public class ActivationController {
         this.activationService = activationService;
     }
 
+
     @RequestMapping(method = RequestMethod.GET, value = "user/{user}")
     public ResponseEntity<Activation> getByUser(@PathVariable("user") Long user) {
         return Optional.ofNullable(this.activationService.findActivationByUser(user))

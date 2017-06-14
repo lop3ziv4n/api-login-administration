@@ -10,11 +10,11 @@ import java.util.List;
 @Repository
 public interface ActivationRepository extends JpaRepository<Activation, Long> {
 
-    Activation findOneByToken(String token);
+    Activation findOneByKey(String key);
 
     Activation findOneByUser(Long user);
 
-    List<Activation> findAllByDateExpiryLessThan(Date date);
+    List<Activation> findAllByDateExpiryLessThan(Date dateExpiry);
 
     List<Activation> findAllByNotificationFalse();
 }

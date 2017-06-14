@@ -1,4 +1,4 @@
-package ar.org.blb.login.administration.mail;
+package ar.org.blb.login.administration.configurations;
 
 import org.springframework.boot.bind.RelaxedPropertyResolver;
 import org.springframework.context.EnvironmentAware;
@@ -18,7 +18,7 @@ import java.util.Collections;
 import java.util.Properties;
 
 @Configuration
-public class MailConfiguration implements EnvironmentAware {
+public class MailConfig implements EnvironmentAware {
 
     private static final String ENV_SPRING_MAIL = "spring.mail.";
 

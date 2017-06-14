@@ -32,7 +32,7 @@ public class User {
 
     @NotEmpty
     @Column(unique = true)
-    private String login;
+    private String username;
 
     @NotEmpty
     @JsonIgnore
@@ -45,11 +45,11 @@ public class User {
     public User() {
     }
 
-    public User(Date dateCreated, Date dateModify, Boolean enabled, String login, String password, List<Role> roles) {
+    public User(Date dateCreated, Date dateModify, Boolean enabled, String username, String password, List<Role> roles) {
         this.dateCreated = dateCreated;
         this.dateModify = dateModify;
         this.enabled = enabled;
-        this.login = login;
+        this.username = username;
         this.password = password;
         this.roles = roles;
     }
@@ -86,12 +86,12 @@ public class User {
         this.enabled = enabled;
     }
 
-    public String getLogin() {
-        return login;
+    public String getUsername() {
+        return username;
     }
 
-    public void setLogin(String login) {
-        this.login = login;
+    public void setUsername(String username) {
+        this.username = username;
     }
 
     public String getPassword() {

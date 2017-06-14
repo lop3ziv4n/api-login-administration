@@ -1,6 +1,5 @@
 package ar.org.blb.login.administration.entities;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.hibernate.validator.constraints.NotEmpty;
 import org.springframework.format.annotation.DateTimeFormat;
 
@@ -18,13 +17,11 @@ public class Activation {
 
     @NotEmpty
     @Column(unique = true)
-    @JsonIgnore
     private String email;
 
     @NotEmpty
     @Column(unique = true)
-    @JsonIgnore
-    private String token;
+    private String key;
 
     @Temporal(TemporalType.TIMESTAMP)
     @DateTimeFormat(pattern = "yyyy-MM-dd")
@@ -39,9 +36,9 @@ public class Activation {
     public Activation() {
     }
 
-    public Activation(String email, String token, Date dateExpiry, Boolean notification, Long user) {
+    public Activation(String email, String key, Date dateExpiry, Boolean notification, Long user) {
         this.email = email;
-        this.token = token;
+        this.key = key;
         this.dateExpiry = dateExpiry;
         this.notification = notification;
         this.user = user;
@@ -63,12 +60,12 @@ public class Activation {
         this.email = email;
     }
 
-    public String getToken() {
-        return token;
+    public String getKey() {
+        return key;
     }
 
-    public void setToken(String token) {
-        this.token = token;
+    public void setKey(String key) {
+        this.key = key;
     }
 
     public Date getDateExpiry() {

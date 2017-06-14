@@ -26,14 +26,14 @@ public class UserService {
         this.userRepository = userRepository;
     }
 
-    public Boolean isUserExistByLogin(String login) {
-        return Optional.ofNullable(this.userRepository.findOneByLogin(login))
+    public Boolean isUserExistByUsername(String username) {
+        return Optional.ofNullable(this.userRepository.findOneByUsername(username))
                 .map(u -> Boolean.TRUE)
                 .orElse(Boolean.FALSE);
     }
 
-    public User getUserByLoginAndPassword(String login, String password) {
-        return Optional.ofNullable(this.userRepository.findOneByLogin(login))
+    public User getUserByUsernameAndPassword(String username, String password) {
+        return Optional.ofNullable(this.userRepository.findOneByUsername(username))
                 .filter(u -> this.passwordEncoder().matches(password, u.getPassword()))
                 .map(e -> e)
                 .orElseThrow(() -> new RuntimeException("No Exists User"));

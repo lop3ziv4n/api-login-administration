@@ -29,11 +29,11 @@ public class ActivationService {
 
     public Activation createActivationByUser(Long user, String email) {
         this.userService.updateUserEnabled(user, Boolean.FALSE);
-        return this.activationRepository.save(new Activation(email, this.randomToken(), this.expirationDate(), Boolean.FALSE, user));
+        return this.activationRepository.save(new Activation(email, this.randomKey(), this.expirationDate(), Boolean.FALSE, user));
     }
 
-    public void deleteActivationByUserActivate(String token) {
-        Optional.ofNullable(this.activationRepository.findOneByToken(token))
+    public void deleteActivationByUserActivate(String key) {
+        Optional.ofNullable(this.activationRepository.findOneByKey(key))
                 .map(a -> {
                     this.activationRepository.delete(a);
                     return this.userService.updateUserEnabled(a.getUser(), Boolean.TRUE);
@@ -87,7 +87,7 @@ public class ActivationService {
 
     private void sendMail(Activation activation) {
         Map<String, String> message = new HashMap<>();
-        message.put(TOKEN, activation.getToken());
+        message.put(TOKEN, activation.getKey());
         message.put(DATE, new Date().toString());
         message.put(DESCRIPTION, "Activate User");
         message.put(USER, activation.getUser().toString());
@@ -102,7 +102,7 @@ public class ActivationService {
         return calendar.getTime();
     }
 
-    private String randomToken() {
+    private String randomKey() {
         return UUID.randomUUID().toString();
     }
 }

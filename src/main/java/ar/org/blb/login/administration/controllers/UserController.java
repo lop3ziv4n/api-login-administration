@@ -21,16 +21,16 @@ public class UserController {
         this.userService = userService;
     }
 
-    @RequestMapping(method = RequestMethod.GET, value = "exist/", params = "login")
-    public ResponseEntity<Boolean> existByLogin(@RequestParam("login") String login) {
-        return Optional.ofNullable(this.userService.isUserExistByLogin(login))
+    @RequestMapping(method = RequestMethod.GET, value = "exist/", params = "username")
+    public ResponseEntity<Boolean> existByUsername(@RequestParam("username") String username) {
+        return Optional.ofNullable(this.userService.isUserExistByUsername(username))
                 .map(a -> new ResponseEntity<>(a, HttpStatus.OK))
                 .orElse(new ResponseEntity<>(HttpStatus.NO_CONTENT));
     }
 
-    @RequestMapping(method = RequestMethod.POST, value = "login/", params = "login")
-    public ResponseEntity<User> getByLoginAndPassword(@RequestParam("login") String login, @RequestBody String password) {
-        return Optional.ofNullable(this.userService.getUserByLoginAndPassword(login, password))
+    @RequestMapping(method = RequestMethod.POST, value = "username/", params = "username")
+    public ResponseEntity<User> getByUsernameAndPassword(@RequestParam("username") String username, @RequestBody String password) {
+        return Optional.ofNullable(this.userService.getUserByUsernameAndPassword(username, password))
                 .map(a -> new ResponseEntity<>(a, HttpStatus.OK))
                 .orElse(new ResponseEntity<>(HttpStatus.NO_CONTENT));
     }
