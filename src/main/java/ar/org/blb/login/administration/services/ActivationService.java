@@ -3,7 +3,7 @@ package ar.org.blb.login.administration.services;
 import ar.org.blb.login.administration.entities.Activation;
 import ar.org.blb.login.administration.repositories.ActivationRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -12,14 +12,11 @@ import java.util.*;
 public class ActivationService {
 
     private ActivationRepository activationRepository;
-
-    private UserService userService;
     private EmailService emailService;
 
     @Autowired
-    public ActivationService(ActivationRepository activationRepository, UserService userService, EmailService emailService) {
+    public ActivationService(ActivationRepository activationRepository, EmailService emailService) {
         this.activationRepository = activationRepository;
-        this.userService = userService;
         this.emailService = emailService;
     }
 
@@ -27,82 +24,53 @@ public class ActivationService {
         return this.activationRepository.findOneByUser(user);
     }
 
-    public Activation createActivationByUser(Long user, String email) {
-        this.userService.updateUserEnabled(user, Boolean.FALSE);
-        return this.activationRepository.save(new Activation(email, this.randomKey(), this.expirationDate(), Boolean.FALSE, user));
+    public Activation findActivationByKey(String key) {
+        return this.activationRepository.findOneByKey(key);
     }
 
-    public void deleteActivationByUserActivate(String key) {
-        Optional.ofNullable(this.activationRepository.findOneByKey(key))
-                .map(a -> {
-                    this.activationRepository.delete(a);
-                    return this.userService.updateUserEnabled(a.getUser(), Boolean.TRUE);
-                })
-                .orElseThrow(() -> new RuntimeException("No Exist Activation"));
+    public List<Activation> findAllActivationByDateExpiryLessThan(Date dateExpiry) {
+        return this.activationRepository.findAllByDateExpiryLessThan(dateExpiry);
     }
 
-    public Activation updateActivationEmail(Long id, String email) {
+    public List<Activation> findAllActivationByNotificationFalse() {
+        return this.activationRepository.findAllByNotificationFalse();
+    }
+
+    public Activation createActivation(Activation activation) {
+        return this.activationRepository.save(activation);
+    }
+
+    public void deleteActivation(Long id) {
+        Optional.ofNullable(this.activationRepository.findOne(id))
+                .ifPresent(a -> this.activationRepository.delete(a));
+    }
+
+    public Activation updateActivation(Activation activation, Long id) {
         return Optional.ofNullable(this.activationRepository.findOne(id))
                 .map(a -> {
-                    a.setEmail(email);
+                    a.setKey(activation.getKey());
+                    a.setEmail(activation.getEmail());
+                    a.setDateExpiry(activation.getDateExpiry());
+                    a.setNotification(activation.getNotification());
+                    a.setUser(activation.getUser());
                     return this.activationRepository.save(a);
                 })
                 .orElseThrow(() -> new RuntimeException("No Exists Activation"));
     }
 
-    public void sendMailActivationByUser(Long user) {
-        Optional.ofNullable(this.activationRepository.findOneByUser(user))
-                .map(a -> {
-                    this.sendMail(a);
-                    a.setNotification(Boolean.TRUE);
-                    return this.activationRepository.save(a);
-                })
-                .orElseThrow(() -> new RuntimeException("No Exists Activation"));
-    }
+    @Value(value = "login.mail.thymeleaf.mail-template-name")
+    private String template;
 
-    @Scheduled(cron = "0 0 1 * * ?")
-    public void removeNotActivatedUsers() {
-        List<Activation> activations = this.activationRepository.findAllByDateExpiryLessThan(new Date());
-        for (Activation activation : activations) {
-            this.activationRepository.delete(activation.getId());
-            this.userService.deleteUser(activation.getUser());
-        }
-    }
-
-    @Scheduled(cron = "0 0 1 * * ?")
-    public void sendMailNotNotifiedUsers() {
-        List<Activation> activations = this.activationRepository.findAllByNotificationFalse();
-        for (Activation activation : activations) {
-            this.sendMail(activation);
-            activation.setNotification(Boolean.TRUE);
-            this.activationRepository.save(activation);
-        }
-    }
-
-    private static final String TOKEN = "token";
-    private static final String USER = "user";
-    private static final String DESCRIPTION = "description";
-    private static final String DATE = "date";
-    private static final String MAIL_TEMPLATE_NAME = "template-mail.html";
-
-    private void sendMail(Activation activation) {
+    public void sendMailActivation(Activation activation) {
         Map<String, String> message = new HashMap<>();
-        message.put(TOKEN, activation.getKey());
-        message.put(DATE, new Date().toString());
-        message.put(DESCRIPTION, "Activate User");
-        message.put(USER, activation.getUser().toString());
+        message.put("token", activation.getKey());
+        message.put("date", new Date().toString());
+        message.put("description", "Activate User");
+        message.put("user", activation.getUser().toString());
 
-        this.emailService.sendMail(activation.getEmail(), "Mail Example", MAIL_TEMPLATE_NAME, message, Boolean.TRUE, Boolean.TRUE);
-    }
+        this.emailService.sendMail(activation.getEmail(), "Mail Example", template, message, Boolean.TRUE, Boolean.TRUE);
 
-    private Date expirationDate() {
-        Calendar calendar = Calendar.getInstance();
-        calendar.setTime(new Date());
-        calendar.add(Calendar.MONTH, 3);
-        return calendar.getTime();
-    }
-
-    private String randomKey() {
-        return UUID.randomUUID().toString();
+        activation.setNotification(Boolean.TRUE);
+        this.activationRepository.save(activation);
     }
 }
