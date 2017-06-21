@@ -1,6 +1,7 @@
 package ar.org.blb.login.administration.entities;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import org.hibernate.validator.constraints.Email;
 import org.hibernate.validator.constraints.NotEmpty;
 import org.springframework.format.annotation.DateTimeFormat;
 
@@ -34,6 +35,11 @@ public class User {
     @Column(unique = true)
     private String username;
 
+    @Email
+    @NotEmpty
+    @Column(unique = true)
+    private String email;
+
     @NotEmpty
     @JsonIgnore
     private String password;
@@ -45,11 +51,12 @@ public class User {
     public User() {
     }
 
-    public User(Date dateCreated, Date dateModify, Boolean enabled, String username, String password, List<Role> roles) {
+    public User(Date dateCreated, Date dateModify, Boolean enabled, String username, String email, String password, List<Role> roles) {
         this.dateCreated = dateCreated;
         this.dateModify = dateModify;
         this.enabled = enabled;
         this.username = username;
+        this.email = email;
         this.password = password;
         this.roles = roles;
     }
@@ -92,6 +99,14 @@ public class User {
 
     public void setUsername(String username) {
         this.username = username;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
     }
 
     public String getPassword() {

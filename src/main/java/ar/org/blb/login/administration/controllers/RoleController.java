@@ -22,14 +22,14 @@ public class RoleController {
         this.roleService = roleService;
     }
 
-    @RequestMapping(method = RequestMethod.GET)
+    @GetMapping
     public ResponseEntity<List<Role>> getAll() {
         return Optional.ofNullable(this.roleService.getAllRole())
                 .map(a -> new ResponseEntity<>(a, HttpStatus.OK))
                 .orElse(new ResponseEntity<>(HttpStatus.NO_CONTENT));
     }
 
-    @RequestMapping(method = RequestMethod.GET, value = "code/{code}")
+    @GetMapping(value = "code/{code}")
     public ResponseEntity<Role> getByCode(@PathVariable("code") String code) {
         return Optional.ofNullable(this.roleService.getRoleByCode(code))
                 .map(a -> new ResponseEntity<>(a, HttpStatus.OK))

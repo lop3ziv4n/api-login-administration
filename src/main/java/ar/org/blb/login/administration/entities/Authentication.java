@@ -18,7 +18,7 @@ public class Authentication {
     private String token;
 
     @NotNull
-    private Long tokenValidity;
+    private Integer tokenValidity;
 
     @NotEmpty
     private String authorities;
@@ -29,7 +29,7 @@ public class Authentication {
     public Authentication() {
     }
 
-    public Authentication(String token, Long tokenValidity, String authorities, Long user) {
+    public Authentication(String token, Integer tokenValidity, String authorities, Long user) {
         this.token = token;
         this.tokenValidity = tokenValidity;
         this.authorities = authorities;
@@ -52,11 +52,11 @@ public class Authentication {
         this.token = token;
     }
 
-    public Long getTokenValidity() {
+    public Integer getTokenValidity() {
         return tokenValidity;
     }
 
-    public void setTokenValidity(Long tokenValidity) {
+    public void setTokenValidity(Integer tokenValidity) {
         this.tokenValidity = tokenValidity;
     }
 

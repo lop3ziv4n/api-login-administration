@@ -1,5 +1,6 @@
 package ar.org.blb.login.administration.entities;
 
+import org.hibernate.validator.constraints.Email;
 import org.hibernate.validator.constraints.NotEmpty;
 import org.springframework.format.annotation.DateTimeFormat;
 
@@ -15,6 +16,7 @@ public class Activation {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
+    @Email
     @NotEmpty
     @Column(unique = true)
     private String email;
