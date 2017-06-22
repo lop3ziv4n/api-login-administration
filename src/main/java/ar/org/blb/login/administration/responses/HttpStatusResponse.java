@@ -3,19 +3,24 @@ package ar.org.blb.login.administration.responses;
 public enum HttpStatusResponse {
 
     USER_NOT_ACTIVE(800, "User Not Active"),
-    USERNAME_NOT_EXISTS(801, "Username Not Exists"),
-    PASSWORD_INCORRECT(802, "Password Incorrect"),
-    AUTHENTICATION_FAILED(803, "Authentication Failed"),
-    AUTHENTICATION_OK(804, "Authentication Ok"),
-    USERNAME_EXISTS(805, "Username Exists"),
-    USER_CREATED_FAILED(806, "User Created Failed"),
-    USER_CREATED(807, "User Created"),
-    ACTIVATION_NOTIFICATION(808, "Activation Notification"),
-    ACTIVATION_NOTIFICATION_FAILED(809, "Activation Notification Failed"),
-    RESET_PASSWORD_NOTIFICATION(810, "Reset Password Notification"),
-    RESET_PASSWORD_NOTIFICATION_FAILED(811, "Reset Password Notification Failed"),
-    PASSWORD_CHANGED(810, "Password changed"),
-    PASSWORD_CHANGED_FAILED(811, "Password changed Failed");
+    USER_NOT_EXISTS(801, "User Not Exists"),
+    USERNAME_NOT_EXISTS(802, "Username Not Exists"),
+    PASSWORD_INCORRECT(803, "Password Incorrect"),
+    AUTHENTICATION_FAILED(804, "Authentication Failed"),
+    AUTHENTICATION_OK(805, "Authentication Ok"),
+    USERNAME_EXISTS(806, "Username Exists"),
+    USER_CREATED_FAILED(807, "User Created Failed"),
+    USER_CREATED(808, "User Created"),
+    ACTIVATION_NOTIFICATION(809, "Activation Notification"),
+    ACTIVATION_NOTIFICATION_FAILED(810, "Activation Notification Failed"),
+    RESET_PASSWORD_NOTIFICATION(811, "Reset Password Notification"),
+    RESET_PASSWORD_NOTIFICATION_FAILED(812, "Reset Password Notification Failed"),
+    PASSWORD_CHANGED(813, "Password changed"),
+    PASSWORD_CHANGED_FAILED(814, "Password changed Failed"),
+    EMAIL_NOT_EXISTS(815, "Email Not Exists"),
+    RESET_PASSWORD_KEY_NOT_EXISTS(816, "Reset Password Key Not Exists"),
+    ACTIVATION_FAILED(817, "Activation Failed"),
+    ACTIVATION_OK(818, "Activation Ok");
 
     private final int value;
     private final String reasonPhrase;

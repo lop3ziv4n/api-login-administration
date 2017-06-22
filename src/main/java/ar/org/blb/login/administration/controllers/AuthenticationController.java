@@ -66,8 +66,8 @@ public class AuthenticationController {
     @PutMapping(value = "logout/{user}")
     public ResponseEntity<Void> logout(@PathVariable("id") Long user) {
         return Optional.ofNullable(this.authenticationService.findAuthenticationByUser(user))
-                .map(a -> {
-                    this.authenticationService.deleteAuthentication(a.getId());
+                .map(authentication -> {
+                    this.authenticationService.deleteAuthentication(authentication.getId());
                     return new ResponseEntity<Void>(HttpStatus.OK);
                 })
                 .orElse(new ResponseEntity<>(HttpStatus.NO_CONTENT));

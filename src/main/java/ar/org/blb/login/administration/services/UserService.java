@@ -3,13 +3,10 @@ package ar.org.blb.login.administration.services;
 import ar.org.blb.login.administration.entities.User;
 import ar.org.blb.login.administration.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Optional;
 
 @Service
@@ -17,13 +14,11 @@ public class UserService {
 
     private UserRepository userRepository;
     private PasswordEncoder passwordEncoder;
-    private EmailService emailService;
 
     @Autowired
-    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder, EmailService emailService) {
+    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
-        this.emailService = emailService;
     }
 
     public User getUserById(Long id) {
@@ -65,18 +60,5 @@ public class UserService {
                     return this.userRepository.save(u);
                 })
                 .orElseThrow(() -> new RuntimeException("No Exists User"));
-    }
-
-    @Value(value = "login.mail.thymeleaf.reset-password.mail-template-nam")
-    private String template;
-
-    public void sendMailResetPassword(User user) {
-        Map<String, String> message = new HashMap<>();
-        message.put("password", user.getPassword());
-        message.put("date", new Date().toString());
-        message.put("description", "Change Password User");
-        message.put("user", user.getId().toString());
-
-        this.emailService.sendMail(user.getEmail(), "Change Password", template, message, Boolean.TRUE, Boolean.TRUE);
     }
 }

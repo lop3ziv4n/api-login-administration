@@ -1,10 +1,13 @@
 package ar.org.blb.login.administration.controllers;
 
 import ar.org.blb.login.administration.entities.Activation;
+import ar.org.blb.login.administration.entities.Authentication;
+import ar.org.blb.login.administration.entities.ResetPassword;
 import ar.org.blb.login.administration.entities.User;
+import ar.org.blb.login.administration.responses.AuthenticationResponse;
 import ar.org.blb.login.administration.responses.HttpStatusResponse;
-import ar.org.blb.login.administration.responses.UserResponse;
 import ar.org.blb.login.administration.services.ActivationService;
+import ar.org.blb.login.administration.services.ResetPasswordService;
 import ar.org.blb.login.administration.services.UserService;
 import ar.org.blb.login.administration.utilities.LoginUtility;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,20 +24,22 @@ public class UserController {
 
     private UserService userService;
     private ActivationService activationService;
+    private ResetPasswordService resetPasswordService;
     private LoginUtility loginUtility;
 
     @Autowired
-    public UserController(UserService userService, ActivationService activationService, LoginUtility loginUtility) {
+    public UserController(UserService userService, ActivationService activationService, ResetPasswordService resetPasswordService, LoginUtility loginUtility) {
         this.userService = userService;
         this.activationService = activationService;
+        this.resetPasswordService = resetPasswordService;
         this.loginUtility = loginUtility;
     }
 
     @PostMapping(value = "create")
-    public ResponseEntity<UserResponse> create(@RequestBody User user) {
+    public ResponseEntity<AuthenticationResponse> create(@RequestBody User user) {
 
         if (Optional.ofNullable(this.userService.getUserByUsernameOrEmail(user.getUsername(), user.getEmail())).isPresent()) {
-            return new ResponseEntity<>(new UserResponse(HttpStatusResponse.USERNAME_EXISTS, new User()), HttpStatus.OK);
+            return new ResponseEntity<>(new AuthenticationResponse(HttpStatusResponse.USERNAME_EXISTS, new Authentication()), HttpStatus.OK);
         }
 
         /*UserResponse userResponse = new UserResponse();
@@ -53,16 +58,16 @@ public class UserController {
         }
         return new ResponseEntity<>(userResponse, HttpStatus.OK);*/
 
-        UserResponse userResponse = Optional.ofNullable(this.userService.createUser(user))
-                .map(u -> Optional.ofNullable(this.activationService.createActivation(this.createActivation(u)))
-                        .map(a -> {
-                            this.activationService.sendMailActivation(a);
-                            return new UserResponse(HttpStatusResponse.ACTIVATION_NOTIFICATION, u);
+        AuthenticationResponse authenticationResponse = Optional.ofNullable(this.userService.createUser(user))
+                .map(userCreated -> Optional.ofNullable(this.activationService.createActivation(this.createActivation(userCreated)))
+                        .map(activation -> {
+                            this.activationService.sendMailActivation(activation);
+                            return new AuthenticationResponse(HttpStatusResponse.ACTIVATION_NOTIFICATION, new Authentication());
                         })
-                        .orElse(new UserResponse(HttpStatusResponse.ACTIVATION_NOTIFICATION_FAILED, new User())))
-                .orElse(new UserResponse(HttpStatusResponse.USER_CREATED_FAILED, new User()));
+                        .orElse(new AuthenticationResponse(HttpStatusResponse.ACTIVATION_NOTIFICATION_FAILED, new Authentication())))
+                .orElse(new AuthenticationResponse(HttpStatusResponse.USER_CREATED_FAILED, new Authentication()));
 
-        return new ResponseEntity<>(userResponse, HttpStatus.OK);
+        return new ResponseEntity<>(authenticationResponse, HttpStatus.OK);
     }
 
     private Activation createActivation(User user) {
@@ -73,39 +78,64 @@ public class UserController {
                 user.getId());
     }
 
-    @PutMapping(value = "notification-reset-password/{email}")
-    public ResponseEntity<UserResponse> notificationResetPassword(@PathVariable("email") String email) {
-        UserResponse userResponse = Optional.ofNullable(this.userService.getUserByEmail(email))
+    @PutMapping(value = "reset-password/{email}")
+    public ResponseEntity<AuthenticationResponse> resetPassword(@PathVariable("email") String email) {
+        AuthenticationResponse authenticationResponse = Optional.ofNullable(this.userService.getUserByEmail(email))
                 .map(user -> Optional.of(user)
-                        .filter(userExists -> userExists.getEnabled())
-                        .map(userEnabled -> Optional.of(userEnabled)
-                                .map(userResetPassword -> {
-                                    this.userService.sendMailResetPassword(userResetPassword);
-                                    return new UserResponse(HttpStatusResponse.RESET_PASSWORD_NOTIFICATION, userResetPassword);
+                        .filter(userExists -> user.getEnabled())
+                        .map(userEnabled -> Optional.ofNullable(this.resetPasswordService.createResetPassword(this.createResetPassword(user)))
+                                .map(resetPassword -> {
+                                    this.resetPasswordService.sendMailResetPassword(resetPassword);
+                                    return new AuthenticationResponse(HttpStatusResponse.RESET_PASSWORD_NOTIFICATION, new Authentication());
                                 })
-                                .orElse(new UserResponse(HttpStatusResponse.RESET_PASSWORD_NOTIFICATION_FAILED, new User())))
-                        .orElse(new UserResponse(HttpStatusResponse.USER_NOT_ACTIVE, new User())))
-                .orElse(new UserResponse(HttpStatusResponse.USERNAME_NOT_EXISTS, new User()));
+                                .orElse(new AuthenticationResponse(HttpStatusResponse.RESET_PASSWORD_NOTIFICATION_FAILED, new Authentication())))
+                        .orElse(new AuthenticationResponse(HttpStatusResponse.USER_NOT_ACTIVE, new Authentication())))
+                .orElse(new AuthenticationResponse(HttpStatusResponse.EMAIL_NOT_EXISTS, new Authentication()));
 
-        return new ResponseEntity<>(userResponse, HttpStatus.OK);
+        return new ResponseEntity<>(authenticationResponse, HttpStatus.OK);
     }
 
-    @PutMapping(value = "change-password/{id}")
-    public ResponseEntity<UserResponse> changePassword(@PathVariable("id") Long id, @RequestBody String password) {
-        UserResponse userResponse = Optional.ofNullable(this.userService.getUserById(id))
-                .map(user -> Optional.of(user)
-                        .filter(userExists -> userExists.getEnabled())
-                        .map(userEnabled -> Optional.of(userEnabled)
-                                .map(userChangePassword -> {
-                                    userChangePassword.setPassword(password);
-                                    this.userService.updateUser(userChangePassword, id);
-                                    return new UserResponse(HttpStatusResponse.PASSWORD_CHANGED, userChangePassword);
-                                })
-                                .orElse(new UserResponse(HttpStatusResponse.PASSWORD_CHANGED_FAILED, new User())))
-                        .orElse(new UserResponse(HttpStatusResponse.USER_NOT_ACTIVE, new User())))
-                .orElse(new UserResponse(HttpStatusResponse.USERNAME_NOT_EXISTS, new User()));
+    private ResetPassword createResetPassword(User user) {
+        return new ResetPassword(user.getEmail(),
+                this.loginUtility.getRandomValue(),
+                user.getId());
+    }
 
-        return new ResponseEntity<>(userResponse, HttpStatus.OK);
+    @PutMapping(value = "change-password/{key}")
+    public ResponseEntity<AuthenticationResponse> changePassword(@PathVariable("key") String key, @RequestBody String password) {
+        AuthenticationResponse authenticationResponse = Optional.ofNullable(this.resetPasswordService.findResetPasswordByKey(key))
+                .map(resetPassword -> Optional.ofNullable(this.userService.getUserById(resetPassword.getUser()))
+                        .map(user -> Optional.ofNullable(user)
+                                .filter(userExists -> user.getEnabled())
+                                .map(userEnabled -> Optional.of(user)
+                                        .map(userChangePassword -> {
+                                            user.setPassword(password);
+                                            this.userService.updateUser(user, user.getId());
+                                            this.resetPasswordService.deleteResetPassword(resetPassword.getId());
+                                            return new AuthenticationResponse(HttpStatusResponse.PASSWORD_CHANGED, new Authentication());
+                                        })
+                                        .orElse(new AuthenticationResponse(HttpStatusResponse.PASSWORD_CHANGED_FAILED, new Authentication())))
+                                .orElse(new AuthenticationResponse(HttpStatusResponse.USER_NOT_ACTIVE, new Authentication())))
+                        .orElse(new AuthenticationResponse(HttpStatusResponse.USER_NOT_EXISTS, new Authentication())))
+                .orElse(new AuthenticationResponse(HttpStatusResponse.RESET_PASSWORD_KEY_NOT_EXISTS, new Authentication()));
+
+        return new ResponseEntity<>(authenticationResponse, HttpStatus.OK);
+    }
+
+    @PutMapping(value = "activation/{key}")
+    public ResponseEntity<AuthenticationResponse> activation(@PathVariable("key") String key) {
+        AuthenticationResponse authenticationResponse = Optional.ofNullable(this.activationService.findActivationByKey(key))
+                .map(activation -> Optional.ofNullable(this.userService.getUserById(activation.getUser()))
+                        .map(user -> {
+                            user.setEnabled(Boolean.TRUE);
+                            this.userService.updateUser(user, user.getId());
+                            this.activationService.deleteActivation(activation.getId());
+                            return new AuthenticationResponse(HttpStatusResponse.ACTIVATION_OK, new Authentication());
+                        })
+                        .orElse(new AuthenticationResponse(HttpStatusResponse.USER_NOT_EXISTS, new Authentication())))
+                .orElse(new AuthenticationResponse(HttpStatusResponse.ACTIVATION_FAILED, new Authentication()));
+
+        return new ResponseEntity<>(authenticationResponse, HttpStatus.OK);
     }
 }
 

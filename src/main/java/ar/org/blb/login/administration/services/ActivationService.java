@@ -63,7 +63,7 @@ public class ActivationService {
 
     public Activation sendMailActivation(Activation activation) {
         Map<String, String> message = new HashMap<>();
-        message.put("token", activation.getKey());
+        message.put("key", activation.getKey());
         message.put("date", new Date().toString());
         message.put("description", "Activate User");
         message.put("user", activation.getUser().toString());
