@@ -58,7 +58,7 @@ public class ActivationService {
                 .orElseThrow(() -> new RuntimeException("No Exists Activation"));
     }
 
-    @Value(value = "login.mail.thymeleaf.activation.mail-template-name")
+    @Value("${login.mail.thymeleaf.activation.mail-template-name}")
     private String template;
 
     public Activation sendMailActivation(Activation activation) {

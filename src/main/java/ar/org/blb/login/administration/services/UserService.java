@@ -39,6 +39,7 @@ public class UserService {
 
     public User createUser(User user) {
         user.setDateCreated(new Date());
+        user.setEnabled(Boolean.FALSE);
         user.setPassword(this.passwordEncoder.encode(user.getPassword()));
         return this.userRepository.save(user);
     }

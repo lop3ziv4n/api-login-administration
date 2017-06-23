@@ -21,8 +21,7 @@ public class Activation {
     @Column(unique = true)
     private String email;
 
-    @NotEmpty
-    @Column(unique = true)
+    @Column(name = "activation_key", nullable = false, unique = true)
     private String key;
 
     @Temporal(TemporalType.TIMESTAMP)

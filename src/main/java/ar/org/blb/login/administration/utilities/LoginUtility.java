@@ -13,10 +13,10 @@ import java.util.stream.Collectors;
 @Component
 public class LoginUtility {
 
-    @Value(value = "login.activation.expiration.date.amount")
+    @Value("${login.activation.expiration.date.amount}")
     private String amount;
 
-    @Value(value = "login.authentication.token.validity.time")
+    @Value("${login.authentication.token.validity.time}")
     private String tokenValidity;
 
     public Date getExpirationDate() {

@@ -41,7 +41,6 @@ public class User {
     private String email;
 
     @NotEmpty
-    @JsonIgnore
     private String password;
 
     @ManyToMany(fetch = FetchType.EAGER)

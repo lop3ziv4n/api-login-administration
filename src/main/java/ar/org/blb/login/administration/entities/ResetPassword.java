@@ -18,8 +18,7 @@ public class ResetPassword {
     @Column(unique = true)
     private String email;
 
-    @NotEmpty
-    @Column(unique = true)
+    @Column(name = "reset_key", nullable = false, unique = true)
     private String key;
 
     @Column(name = "user_id", nullable = false, unique = true)

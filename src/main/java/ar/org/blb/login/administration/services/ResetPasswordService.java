@@ -47,7 +47,7 @@ public class ResetPasswordService {
                 .orElseThrow(() -> new RuntimeException("No Exists Reset Password"));
     }
 
-    @Value(value = "login.mail.thymeleaf.reset-password.mail-template-nam")
+    @Value("${login.mail.thymeleaf.reset-password.mail-template-name}")
     private String template;
 
     public void sendMailResetPassword(ResetPassword resetPassword) {
