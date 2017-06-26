@@ -1,6 +1,6 @@
-package ar.org.blb.login.administration.responses;
+package ar.org.blb.login.administration.utilities;
 
-public enum HttpStatusResponse {
+public enum AuthenticationStatus {
 
     USER_NOT_ACTIVE(800, "User Not Active"),
     USER_NOT_EXISTS(801, "User Not Exists"),
@@ -25,7 +25,7 @@ public enum HttpStatusResponse {
     private final int value;
     private final String reasonPhrase;
 
-    HttpStatusResponse(int value, String reasonPhrase) {
+    AuthenticationStatus(int value, String reasonPhrase) {
         this.value = value;
         this.reasonPhrase = reasonPhrase;
     }
@@ -38,8 +38,8 @@ public enum HttpStatusResponse {
         return this.reasonPhrase;
     }
 
-    public static HttpStatusResponse valueOf(int statusCode) {
-        for (HttpStatusResponse status : values()) {
+    public static AuthenticationStatus valueOf(int statusCode) {
+        for (AuthenticationStatus status : values()) {
             if (status.value == statusCode) {
                 return status;
             }

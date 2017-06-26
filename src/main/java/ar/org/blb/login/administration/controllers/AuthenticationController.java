@@ -3,9 +3,9 @@ package ar.org.blb.login.administration.controllers;
 import ar.org.blb.login.administration.entities.Authentication;
 import ar.org.blb.login.administration.entities.User;
 import ar.org.blb.login.administration.responses.AuthenticationResponse;
-import ar.org.blb.login.administration.responses.HttpStatusResponse;
 import ar.org.blb.login.administration.services.AuthenticationService;
 import ar.org.blb.login.administration.services.UserService;
+import ar.org.blb.login.administration.utilities.AuthenticationStatus;
 import ar.org.blb.login.administration.utilities.LoginUtility;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -39,13 +39,13 @@ public class AuthenticationController {
                 if (userOptional.filter(u -> this.userService.matchesPassword(u, user.getPassword())).isPresent()) {
                     authenticationResponse = this.createAuthenticationResponse(this.authenticationService.createAuthentication(this.createAuthentication(userOptional.get())));
                 } else {
-                    authenticationResponse.setStatus(HttpStatusResponse.PASSWORD_INCORRECT);
+                    authenticationResponse.setStatus(AuthenticationStatus.PASSWORD_INCORRECT);
                 }
             } else {
-                authenticationResponse.setStatus(HttpStatusResponse.USER_NOT_ACTIVE);
+                authenticationResponse.setStatus(AuthenticationStatus.USER_NOT_ACTIVE);
             }
         } else {
-            authenticationResponse.setStatus(HttpStatusResponse.USERNAME_NOT_EXISTS);
+            authenticationResponse.setStatus(AuthenticationStatus.USERNAME_NOT_EXISTS);
         }
         return new ResponseEntity<>(authenticationResponse, HttpStatus.OK);*/
 
@@ -56,9 +56,9 @@ public class AuthenticationController {
                                 .map(userEnabled -> Optional.of(userEnabled)
                                         .filter(userMatchesPassword -> this.userService.matchesPassword(userMatchesPassword, user.getPassword()))
                                         .map(userAuthentication -> this.createAuthenticationResponse(this.authenticationService.createAuthentication(this.createAuthentication(userAuthentication))))
-                                        .orElse(new AuthenticationResponse(HttpStatusResponse.PASSWORD_INCORRECT, new Authentication())))
-                                .orElse(new AuthenticationResponse(HttpStatusResponse.USER_NOT_ACTIVE, new Authentication())))
-                        .orElse(new AuthenticationResponse(HttpStatusResponse.USERNAME_NOT_EXISTS, new Authentication()));
+                                        .orElse(new AuthenticationResponse(AuthenticationStatus.PASSWORD_INCORRECT, new Authentication())))
+                                .orElse(new AuthenticationResponse(AuthenticationStatus.USER_NOT_ACTIVE, new Authentication())))
+                        .orElse(new AuthenticationResponse(AuthenticationStatus.USERNAME_NOT_EXISTS, new Authentication()));
 
         return new ResponseEntity<>(authenticationResponse, HttpStatus.OK);
     }
@@ -80,8 +80,8 @@ public class AuthenticationController {
 
     private AuthenticationResponse createAuthenticationResponse(Authentication authentication) {
         return Optional.ofNullable(authentication)
-                .map(a -> new AuthenticationResponse(HttpStatusResponse.AUTHENTICATION_OK, a))
-                .orElse(new AuthenticationResponse(HttpStatusResponse.AUTHENTICATION_FAILED, new Authentication()));
+                .map(a -> new AuthenticationResponse(AuthenticationStatus.AUTHENTICATION_OK, a))
+                .orElse(new AuthenticationResponse(AuthenticationStatus.AUTHENTICATION_FAILED, new Authentication()));
     }
 
     private Authentication createAuthentication(User user) {

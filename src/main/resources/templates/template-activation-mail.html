@@ -1,24 +1,29 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
-    <head>
-        <title th:remove="all">Client Confirmation</title>
-        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
-    </head>
-    <body>
-        <div>
-            <h2 th:text="#{greeting(${user})}">
-                </span> User
-            </h2>
-            <p th:text="${description}">
-                Description
-            </p>
-            <p>
-                You have been successfully subscribed to the <b>Fake newsletter</b> on
-                <span th:text="${#dates.format(date)}">28-12-2012</span>
-            </p>
-            <p th:text="${key}">
-                Key
-            </p>
-        </div>
-    </body>
+<head>
+    <title th:remove="all">Client Confirmation</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    <!-- bootstrap css -->
+    <link href="//netdna.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" rel="stylesheet"/>
+    <!-- application css -->
+    <link href="styles.css" rel="stylesheet"/>
+</head>
+<body>
+<div>
+    <h2 th:text="${email}">
+        <span/> Email
+    </h2>
+    <p th:text="${description}">
+        Description
+    </p>
+    <span th:text="${#dates.format(date, 'dd-MMM-yyyy')}">28-12-2012</span>
+    <p>
+        Please verify your email
+        Click on the link below or copy and paste in your browser
+    </p>
+    <a th:text="${link}">
+        Link
+    </a>
+</div>
+</body>
 </html>

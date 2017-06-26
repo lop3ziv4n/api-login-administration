@@ -47,16 +47,19 @@ public class ResetPasswordService {
                 .orElseThrow(() -> new RuntimeException("No Exists Reset Password"));
     }
 
-    @Value("${login.mail.thymeleaf.reset-password.mail-template-name}")
+    @Value("${thymeleaf.reset-password.mail-template-name}")
     private String template;
 
-    public void sendMailResetPassword(ResetPassword resetPassword) {
-        Map<String, String> message = new HashMap<>();
-        message.put("key", resetPassword.getKey());
-        message.put("date", new Date().toString());
-        message.put("description", "Change Password User");
-        message.put("user", resetPassword.getUser().toString());
+    @Value("${login.url.reset-password}")
+    private String link;
 
-        this.emailService.sendMail(resetPassword.getEmail(), "Change Password", template, message, Boolean.TRUE, Boolean.TRUE);
+    public void sendMailResetPassword(ResetPassword resetPassword) {
+        Map<String, Object> message = new HashMap<>();
+        message.put("link", this.link.replace("$key",resetPassword.getKey()));
+        message.put("date", new Date());
+        message.put("description", "Reset Password User");
+        message.put("email", resetPassword.getEmail());
+
+        this.emailService.sendMailHtml(resetPassword.getEmail(), "Change Password", this.template, message);
     }
 }

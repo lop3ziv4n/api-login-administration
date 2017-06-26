@@ -58,17 +58,20 @@ public class ActivationService {
                 .orElseThrow(() -> new RuntimeException("No Exists Activation"));
     }
 
-    @Value("${login.mail.thymeleaf.activation.mail-template-name}")
+    @Value("${thymeleaf.activation.mail-template-name}")
     private String template;
 
-    public Activation sendMailActivation(Activation activation) {
-        Map<String, String> message = new HashMap<>();
-        message.put("key", activation.getKey());
-        message.put("date", new Date().toString());
-        message.put("description", "Activate User");
-        message.put("user", activation.getUser().toString());
+    @Value("${login.url.activation}")
+    private String link;
 
-        this.emailService.sendMail(activation.getEmail(), "Activate User", template, message, Boolean.TRUE, Boolean.TRUE);
+    public Activation sendMailActivation(Activation activation) {
+        Map<String, Object> message = new HashMap<>();
+        message.put("link", this.link.replace("$key", activation.getKey()));
+        message.put("date", new Date());
+        message.put("description", "Activate User");
+        message.put("email", activation.getEmail());
+
+        this.emailService.sendMailHtml(activation.getEmail(), "Activate User", this.template, message);
 
         activation.setNotification(Boolean.TRUE);
         return this.activationRepository.save(activation);
