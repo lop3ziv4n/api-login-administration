@@ -33,8 +33,8 @@ public class UserService {
         return this.userRepository.findOneByEmail(email);
     }
 
-    public Boolean matchesPassword(User user, String password) {
-        return this.passwordEncoder.matches(password, user.getPassword());
+    public Boolean matchesPassword(String rawPassword, String encodedPassword) {
+        return this.passwordEncoder.matches(rawPassword, encodedPassword);
     }
 
     public User createUser(User user) {

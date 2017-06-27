@@ -54,7 +54,7 @@ public class AuthenticationController {
                         .map(u -> Optional.of(u)
                                 .filter(userExists -> userExists.getEnabled())
                                 .map(userEnabled -> Optional.of(userEnabled)
-                                        .filter(userMatchesPassword -> this.userService.matchesPassword(userMatchesPassword, user.getPassword()))
+                                        .filter(userMatchesPassword -> this.userService.matchesPassword(user.getPassword(), userMatchesPassword.getPassword()))
                                         .map(userAuthentication -> this.createAuthenticationResponse(this.authenticationService.createAuthentication(this.createAuthentication(userAuthentication))))
                                         .orElse(new AuthenticationResponse(AuthenticationStatus.PASSWORD_INCORRECT, new Authentication())))
                                 .orElse(new AuthenticationResponse(AuthenticationStatus.USER_NOT_ACTIVE, new Authentication())))
