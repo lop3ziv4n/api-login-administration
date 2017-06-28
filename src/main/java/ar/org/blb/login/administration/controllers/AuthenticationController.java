@@ -32,32 +32,16 @@ public class AuthenticationController {
 
     @PostMapping(value = "login")
     public ResponseEntity<AuthenticationResponse> login(@RequestBody User user) {
-        /*AuthenticationResponse authenticationResponse = new AuthenticationResponse();
-        Optional<User> userOptional = Optional.of(this.userService.getUserByUsernameOrEmail(user.getUsername(), user.getEmail()));
-        if (userOptional.isPresent()) {
-            if (userOptional.filter(u -> u.getEnabled()).isPresent()) {
-                if (userOptional.filter(u -> this.userService.matchesPassword(u, user.getPassword())).isPresent()) {
-                    authenticationResponse = this.createAuthenticationResponse(this.authenticationService.createAuthentication(this.createAuthentication(userOptional.get())));
-                } else {
-                    authenticationResponse.setStatus(AuthenticationStatus.PASSWORD_INCORRECT);
-                }
-            } else {
-                authenticationResponse.setStatus(AuthenticationStatus.USER_NOT_ACTIVE);
-            }
-        } else {
-            authenticationResponse.setStatus(AuthenticationStatus.USERNAME_NOT_EXISTS);
-        }
-        return new ResponseEntity<>(authenticationResponse, HttpStatus.OK);*/
-
         AuthenticationResponse authenticationResponse =
                 Optional.ofNullable(this.userService.getUserByUsernameOrEmail(user.getUsername(), user.getEmail()))
-                        .map(u -> Optional.of(u)
-                                .filter(userExists -> userExists.getEnabled())
-                                .map(userEnabled -> Optional.of(userEnabled)
-                                        .filter(userMatchesPassword -> this.userService.matchesPassword(user.getPassword(), userMatchesPassword.getPassword()))
-                                        .map(userAuthentication -> this.createAuthenticationResponse(this.authenticationService.createAuthentication(this.createAuthentication(userAuthentication))))
-                                        .orElse(new AuthenticationResponse(AuthenticationStatus.PASSWORD_INCORRECT, new Authentication())))
-                                .orElse(new AuthenticationResponse(AuthenticationStatus.USER_NOT_ACTIVE, new Authentication())))
+                        .map(u ->
+                                Optional.of(u)
+                                        .filter(userExists -> userExists.getEnabled())
+                                        .map(userEnabled -> Optional.of(userEnabled)
+                                                .filter(userMatchesPassword -> this.userService.matchesPassword(user.getPassword(), userMatchesPassword.getPassword()))
+                                                .map(userAuthentication -> this.createAuthenticationResponse(this.authenticationService.createAuthentication(this.createAuthentication(userAuthentication))))
+                                                .orElse(new AuthenticationResponse(AuthenticationStatus.PASSWORD_INCORRECT, new Authentication())))
+                                        .orElse(new AuthenticationResponse(AuthenticationStatus.USER_NOT_ACTIVE, new Authentication())))
                         .orElse(new AuthenticationResponse(AuthenticationStatus.USERNAME_NOT_EXISTS, new Authentication()));
 
         return new ResponseEntity<>(authenticationResponse, HttpStatus.OK);

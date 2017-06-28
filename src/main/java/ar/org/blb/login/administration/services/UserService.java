@@ -49,15 +49,21 @@ public class UserService {
                 .ifPresent(u -> this.userRepository.delete(u));
     }
 
-    public User updateUser(User user, Long id) {
+    public User updateUserStatus(Boolean enabled, Long id) {
         return Optional.ofNullable(this.userRepository.findOne(id))
                 .map(u -> {
                     u.setDateModify(new Date());
-                    u.setPassword(this.passwordEncoder.encode(user.getPassword()));
-                    u.setUsername(user.getUsername());
-                    u.setEmail(user.getEmail());
-                    u.setEnabled(user.getEnabled());
-                    u.setRoles(user.getRoles());
+                    u.setEnabled(enabled);
+                    return this.userRepository.save(u);
+                })
+                .orElseThrow(() -> new RuntimeException("No Exists User"));
+    }
+
+    public User updateUserPassword(String password, Long id) {
+        return Optional.ofNullable(this.userRepository.findOne(id))
+                .map(u -> {
+                    u.setDateModify(new Date());
+                    u.setPassword(this.passwordEncoder.encode(password));
                     return this.userRepository.save(u);
                 })
                 .orElseThrow(() -> new RuntimeException("No Exists User"));
